@@ -1,0 +1,7 @@
+Nome: João Pedro Leal Gómez de Vargas
+
+O programa simula um robô que começa na posição 0,0. Ele recebe instruções U, D, L, R para se mover. Após efetuar os movimentos do robô ele verifica se ele 
+retournou a posição 0,0 e retorna verdadeiro. Caso contrário retorna falso.
+
+O primeiro código não rodava e não fazia o necessário. Tentei programa-lo orientado a objeto e só me prejudiquei no processo.
+
