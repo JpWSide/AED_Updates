@@ -1,9 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int *rodando;
+void **pBuffer;
+void *newNode(char *nome, int *idade, double *telefone);
+void addContato(char *nome, int *idade, double *telefone, void **head);
+void delContato(char *nome, void **head);
+void procurarContato(void **head, char *nome);
+void listarContato();
+void freeLista();
+int ordemAlfa();
+
 void *newNode(char *nome, int *idade, double *telefone)
 {
-    void nodo = (void *)calloc(1, sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **) * 2);
+    void *nodo = (void *)calloc(1, sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **) * 2);
 
     char *pNome = (char *)nodo;
     int *pIdade = (int *)(nodo + sizeof(char) * 11);
@@ -13,7 +23,7 @@ void *newNode(char *nome, int *idade, double *telefone)
 
     copia(pNome, nome, strlen(nome));
     *pIdade = *idade;
-    *pNumero = *numero;
+    *pNumero = *telefone;
     *pAnt = NULL;
     *pProx = NULL;
     return nodo;
@@ -24,8 +34,8 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
     void *nodo = newNode(nome, idade, telefone);
 
     void **ant, **atual;
-    ant = malloc(sizeof(**void));
-    atual = malloc(sizeof(**void));
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
     *ant = NULL;
     *atual = (void *)*head;
 
@@ -40,7 +50,7 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
         return 0;
     }
 
-    while (*atual != NULL)
+    while (*atual != NULL && ordemAlfa(nome, (char*) *atual >= 0))
     {
         *ant = *atual;
         *atual = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
@@ -49,7 +59,8 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
     {
         *pProx = *atual;
         void **antDeAtual = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double));
-        **antDeAtual = nodo;
+        *antDeAtual = nodo;
+        *head = nodo;
     }
     else if (*atual != NULL)
     {
@@ -60,10 +71,10 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
     else if (*atual != NULL)
     {
         void **antDeProx = (nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-        **antDeProx = node;
+        *antDeProx = nodo;
         *pProx = *atual;
         void **antDeAtual = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double));
-        *antDeAtual = node;
+        *antDeAtual = nodo;
         *pAnt = *ant;
     }
     else
@@ -77,36 +88,63 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
     return 0;
 }
 
-void delContato(char *nome, void **head){
-    if(*head == NULL){
+void delContato(char *nome, void **head)
+{
+    if (*head == NULL)
         return 0;
-        void **ant, **atual, **prox;
-        ant = malloc(sizeof(void**));
-        atual = malloc(sizeof(void**));
-        *ant = NULL;
-        *atual = (void*) *head;
 
-        while(*atual != NULL ){
-            *ant = atual;
-            *atual = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-        }
+    void **ant, **atual, **prox;
+    ant = malloc(sizeof(void **));
+    atual = malloc(sizeof(void **));
+    *ant = NULL;
+    *atual = (void *)*head;
 
-        void **pAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double));
-        void **pProximo = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-        
-        if(*pProximo != NULL){
-            void **antDoProximo = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-            *antDoProximo = pProximo;
-            void **proximoDoAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-            *proximoDoAnt = *ant;
-        }else if(*pAnt != NULL){
-            void **antDoProximo =(void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
-            *antDoProximo = NULL;
-        }
-        free(ant);
-        free(*atual);
-        free(atual);
+    while (*atual != NULL && ordemAlfa(nome, (char*)*atual)!= 0) 
+    {
+        *ant = *atual;
+        *atual = *(void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
     }
+
+    void **pAnt = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(double));
+    void **pProximo = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
+
+    if (*pProximo != NULL)
+    {
+        void **antDoProximo = (void **)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
+        *antDoProximo = *pProximo;
+        void **proximoDoAnt = (void **)(*pProximo + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
+        *proximoDoAnt = *ant;
+    }
+    else if (*pAnt != NULL)
+    {
+        void **antDoProximo = (void **)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(double) + sizeof(void **));
+        *antDoProximo = NULL;
+    }
+    free(ant);
+    free(*atual);
+    free(atual);
+}
+
+void procurarContato(void **head, char *nome){
+
+}
+int ordemAlfa(char *nm1, char *nm2){
+    while(*nm1 && *nm2 && *nm1 == *nm2){
+        nm1++;
+        nm2++;
+    }
+    int *res = malloc(sizeof(int));
+    *res = (*nm1 - *nm2);
+
+    if(*res < 0){
+        free(res);
+        return -1;
+    }else if(*res > 0){
+        free(res);
+        return 1;
+    }
+    free(res);
+    return 0;
 }
 
 void menu()
@@ -118,9 +156,9 @@ void menu()
     printf("3- Buscar contato/n");
     printf("4- Listar contato/n");
     printf("5- Sair/n");
-    scanf("%d", escolha)
+    scanf("%d", escolha);
 
-        switch (escolha)
+    switch (*escolha)
     {
     case 1:
         int *idade = malloc(sizeof(int));
@@ -151,8 +189,8 @@ void menu()
 
         break;
     default:
-        printf("Opção invalida, digite uma opçao valida!!!")
-            menu();
+        printf("Opção invalida, digite uma opçao valida!!!");
+        menu();
         break;
     }
 }
