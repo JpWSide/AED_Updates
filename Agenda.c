@@ -47,7 +47,7 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
         *head = nodo;
         free(ant);
         free(atual);
-        return 0;
+        return;
     }
 
     while (*atual != NULL && ordemAlfa(nome, (char *)*atual >= 0))
@@ -85,13 +85,13 @@ void addContato(char *nome, int *idade, double *telefone, void **head)
     }
     free(ant);
     free(atual);
-    return 0;
+    return ;
 }
 
 void delContato(char *nome, void **head)
 {
     if (*head == NULL)
-        return 0;
+        return ;
 
     void **ant, **atual, **prox;
     ant = malloc(sizeof(void **));
@@ -128,7 +128,7 @@ void delContato(char *nome, void **head)
 void procurarContato(void **head, char *nome)
 {
     if (*head == NULL)
-        return 0;
+        return ;
 
     void **ant, **atual;
     *ant = malloc(sizeof(void **));
@@ -176,22 +176,22 @@ int ordemAlfa(char *nm1, char *nm2)
     return 0;
 }
 
-void listarContato(void *head, int* total){
+void listarContato(void **head, int* total){
     void **ant, **atual;
     ant = malloc(sizeof(void**));
     atual = malloc(sizeof(void**));
     *ant = NULL;
-    *atual = (void*)*stackHead;
+    *atual = (void*)*head;
     int *contador = malloc(sizeof(int));
     *contador = 0;
-    while (*atual != NULL && *total > *c) {
+    while (*atual != NULL && *total > *contador) {
         *ant = *atual;
         printf("-------------------------------\n");
-        printf("Nome: %s\n", (char*)*(void**)prev);
+        printf("Nome: %s\n", (char*)*(void**)ant);
         *ant += sizeof(char) * 11;
-        printf("Idade: %d\n", *(int*)*prev);
+        printf("Idade: %d\n", *(int*)*ant);
         *ant += sizeof(int);
-        printf("Number: %ld\n", *(long*)*prev);
+        printf("Number: %ld\n", *(long*)*ant);
         *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
         (*contador)++;
     }
@@ -200,19 +200,18 @@ void listarContato(void *head, int* total){
     free(atual);
 }
 
-
 void menu()
 {
-    int *escolha;
+    int escolha;
     printf("Selecione a opção desejada:\n");
     printf("1- Adicionar contato\n");
     printf("2- Remover contato\n");
     printf("3- Buscar contato\n");
     printf("4- Listar contato\n");
     printf("5- Sair\n");
-    scanf("%d", escolha);
+    scanf("%d", &escolha);
 
-    switch (*escolha)
+    switch (escolha)
     {
     case 1:
         int *idade = malloc(sizeof(int));
@@ -231,7 +230,7 @@ void menu()
         free(telefone);
         break;
     case 2:
-        char *nomeRemover = malloc(sizeof(char)*11)
+        char *nomeRemover = malloc(sizeof(char)*11);
         printf("Digite o nome do contato: ");
         scanf("%s", nomeRemover);
         delContato(nomeRemover, pBuffer);
@@ -241,13 +240,14 @@ void menu()
          char *nomeProcura = malloc(sizeof(char) * 11);
         printf("Digite o nome do contato a ser exibido: ");
         scanf(" %s", nomeProcura);
-        searchName(pBuffer, nomeProcura);
+        procurarContato(pBuffer, nomeProcura);
         free(nomeProcura);
+        break;
     case 4:
         int *numLista = malloc(sizeof(int));
         printf("Quantos contatos deseja listar? ");
         scanf("%d", numLista);
-        list(pBuffer, numLista);
+        listarContato(pBuffer, numLista);
         free(numLista);
         break;
     default:
