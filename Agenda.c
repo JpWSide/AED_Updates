@@ -2,162 +2,181 @@
 #include <stdlib.h>
 #include <string.h>
 
-int *rodando;
 void **pBuffer;
-void *newNode(char *nome, int *idade, int *telefone);
-void addContato(char *nome, int *idade, int *telefone, void **head);
-void delContato(char *nome, void **head);
-void procurarContato(void **head, char *nome);
-void listarContato();
-int ordemAlfa();
+int *rodando;
+void menu();
 
-void *newNode(char *nome, int *idade, int *telefone)
+int main(int argc, char *argv[])
 {
-    void *nodo = (void *)calloc(1, sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **) * 2);
-
-    char *pNome = (char *)nodo;
-    int *pIdade = (int *)(nodo + sizeof(char) * 11);
-    int *pNumero = (int *)(nodo + sizeof(char) * 11 + sizeof(int));
-    void **pAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(int));
-    void **pProx = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-
-    memcpy(pNome, nome, strlen(nome));
-    *pIdade = *idade;
-    *pNumero = *telefone;
-    *pAnt = NULL;
-    *pProx = NULL;
-    return nodo;
+    rodando = (int *)malloc(sizeof(int));
+    *rodando = 0;
+    pBuffer = malloc(sizeof(void**));
+    *pBuffer = NULL;
+    
+    while (*rodando == 0)
+        menu();
+    
+    free(rodando);
+    free(pBuffer);
+    return 0;
 }
 
-void addContato(char *nome, int *idade, int *telefone, void **head)
+void * newNode(char* nome, int* idade, long* telefone){
+    void * nodo = (void *)calloc(1, sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**) * 2);
+
+    char * pNome = (char *)nodo;
+    int * pIdade = (int *)(nodo + sizeof(char) * 11);
+    long * pTelefone =  (long *)(nodo + sizeof(char) * 11 + sizeof(int));
+    void ** pAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+    void ** pProx = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+    
+    memcpy(pNome, nome, strlen(nome));
+    *pIdade = *idade;
+    *pTelefone = *telefone;
+    *pAnt = NULL;
+    *pProx = NULL;
+	return nodo;
+}
+
+void addContato(char* nome, int* idade, long* telefone, void ** head)
 {
     void *nodo = newNode(nome, idade, telefone);
-
     void **ant, **atual;
-    ant = malloc(sizeof(void **));
-    atual = malloc(sizeof(void **));
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
     *ant = NULL;
-    *atual = (void *)*head;
+    *atual = (void*)*head;
 
-    void **pAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(int));
-    void **pProx = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-
-    if (*head == NULL)
-    {
+    void ** pAnt = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+    void ** pProx = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+    
+    if (*head == NULL) {
         *head = nodo;
         free(ant);
         free(atual);
         return;
     }
-
-    while (*atual != NULL && ordemAlfa(nome, (char *)*atual) >= 0)
-    {
+    while (*atual != NULL && ordemAlfa(nome, (char*)*atual) >= 0) {
         *ant = *atual;
-        *atual = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
+        *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
     }
-    if (*ant == NULL)
-    {
+    if (*ant == NULL) {
         *pProx = *atual;
-        void **antDeAtual = (void **)(nodo + sizeof(char) * 11 + sizeof(int) + sizeof(int));
-        *antDeAtual = nodo;
+        void** antAtual = (void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+        *antAtual = nodo;
         *head = nodo;
     }
-    else if (*atual != NULL)
-    {
-        void **antDeProx = (*ant + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        *antDeProx = nodo;
+    else if (*atual != NULL) { 
+        void** proxAnt = (void**)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        *proxAnt = nodo;
         *pProx = *atual;
-        void **antDeAtual = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int));
-        *antDeAtual = nodo;
+        void** antAtual = (void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+        *antAtual = nodo;
         *pAnt = ant;
     }
-    else
-    {
-        void **antDeProx = (*ant + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        *antDeProx = nodo;
+    else {
+        void** proxAnt = (void**)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        *proxAnt = nodo;
         *pAnt = *ant;
     }
+
     free(ant);
     free(atual);
     return;
 }
 
-void delContato(char *nome, void **head)
-{
+void delContato(char* nome, void** head){
     if (*head == NULL)
         return;
-
+    
     void **ant, **atual, **prox;
-    ant = malloc(sizeof(void **));
-    atual = malloc(sizeof(void **));
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
     *ant = NULL;
-    *atual = (void *)*head;
+    *atual = (void*)*head;
 
-    while (*atual != NULL && ordemAlfa(nome, (char *)*atual) != 0)
-    {
+    while (*atual != NULL && ordemAlfa(nome, (char*)*atual) != 0) {
         *ant = *atual;
-        *atual = *(void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
+        *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
     }
-
-    void **pAnt = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int));
-    void **pProximo = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-
-    if (*pProximo != NULL)
-    {
-        void **antDoProximo = (void **)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        *antDoProximo = *pProximo;
-        void **proximoDoAnt = (void **)(*pProximo + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        *proximoDoAnt = *ant;
+    void ** pAnt = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+    void ** pProx = (void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+    if (*head == *atual){
+        *head = *pProx;
     }
-    else if (*pAnt != NULL)
-    {
-        void **antDoProximo = (void **)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        *antDoProximo = NULL;
+    else if (*pProx != NULL) { 
+        void** proxAnt = (void**)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        *proxAnt = *pProx;
+        void** antProx = (void**)(*pProx + sizeof(char) * 11 + sizeof(int) + sizeof(long));
+        *antProx = *ant;
+    }
+    else if (*pAnt != NULL){
+        void** proxAnt = (void**)(*ant + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        *proxAnt = NULL;
     }
     free(ant);
     free(*atual);
     free(atual);
 }
 
-void procurarContato(void **head, char *nome)
-{
+void procurarContato(void** head,char* nome){
     if (*head == NULL)
         return;
-
+    
     void **ant, **atual;
-    ant = malloc(sizeof(void **));
-    atual = malloc(sizeof(void **));
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
     *ant = NULL;
-    *atual = (void *)*head;
+    *atual = (void*)*head;
 
-    while (*atual != NULL && ordemAlfa(nome, (char *)*atual) != 0)
-    {
+    while (*atual != NULL && ordemAlfa(nome, (char*)*atual) != 0) {
         *ant = *atual;
-        *atual = *(void **)(atual + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
+        *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
     }
     *ant = *atual;
-    printf("Contato:\n");
-    printf("Nome: %s\n", (char *)*ant);
+    printf("-------------------------------\n");
+    printf("Nome: %s\n", (char*)*ant);
     *ant += sizeof(char) * 11;
-    printf("Idade: %d\n", *(int *)*ant);
+    printf("Idade: %d\n", *(int*)*ant);
     *ant += sizeof(int);
-    printf("Number: %ld\n", *(int *)*ant);
+    printf("Number: %ld\n", *(long*)*ant);
     free(ant);
     free(atual);
 }
 
-int ordemAlfa(char *nm1, char *nm2)
-{
-    while (*nm1 && *nm2 && *nm1 == *nm2)
-    {
+void list(void** head, int* total){
+    void **ant, **atual;
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
+    *ant = NULL;
+    *atual = (void*)*head;
+    int *c = malloc(sizeof(int));
+    *c = 0;
+    while (*atual != NULL && *total > *c) {
+        *ant = *atual;
+        printf("-------------------------------\n");
+        printf("Nome: %s\n", (char*)*(void**)ant);
+        *ant += sizeof(char) * 11;
+        printf("Idade: %d\n", *(int*)*ant);
+        *ant += sizeof(int);
+        printf("Number: %ld\n", *(long*)*ant);
+        *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        (*c)++;
+    }
+    free(c);
+    free(ant);
+    free(atual);
+}
+
+int ordemAlfa(char* nm1, char* nm2){
+    while (*nm1 && *nm2 && *nm1 == *nm2) {
         nm1++;
         nm2++;
     }
     int *res = malloc(sizeof(int));
     *res = (*nm1 - *nm2);
 
-    if (*res < 0)
-    {
+    if (*res < 0){
         free(res);
         return -1;
     }
@@ -166,109 +185,83 @@ int ordemAlfa(char *nm1, char *nm2)
         free(res);
         return 1;
     }
+
     free(res);
     return 0;
 }
 
-void listarContato(void **head, int *total)
-{
+void freeList(void** head){
     void **ant, **atual;
-    ant = malloc(sizeof(void **));
-    atual = malloc(sizeof(void **));
+    ant = malloc(sizeof(void**));
+    atual = malloc(sizeof(void**));
     *ant = NULL;
-    *atual = (void *)*head;
-    int *contador = malloc(sizeof(int));
-    *contador = 0;
-    while (*atual != NULL && *total > *contador)
-    {
+    *atual = (void*)*head;
+
+    while (*atual != NULL) {
         *ant = *atual;
-        printf("\nContato:\n");
-        printf("Nome: %s\n", (char *)*(void **)ant);
-        *ant += sizeof(char) * 11;
-        printf("Idade: %d\n", *(int *)*ant);
-        *ant += sizeof(int);
-        printf("Telefone: %ld\n", *(int *)*ant);
-        *atual = *(void **)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(int) + sizeof(void **));
-        (*contador)++;
+        *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
+        free(*ant);
     }
-    free(contador);
     free(ant);
     free(atual);
 }
 
 void menu()
 {
-    int escolha;
-    printf("Selecione a opção desejada:\n");
-    printf("1- Adicionar contato\n");
-    printf("2- Remover contato\n");
-    printf("3- Buscar contato\n");
-    printf("4- Listar contato\n");
-    printf("5- Sair\n");
-    scanf("%d", &escolha);
+    printf("Escolha uma das opcoes abaixo: \n");
+    printf("1 Adicionar um Contato:  \n");
+    printf("2 Listar Contatos: \n");
+    printf("3 Procurar nome de um Contato: \n");
+    printf("4 Remover um Contato: \n");
+    printf("5 Sair: \n");
 
-    switch (escolha)
+    int opcao = 0;
+    scanf("%d", &opcao);
+    switch (opcao)
     {
     case 1:
+        printf("Digite o nome: ");
         int *idade = malloc(sizeof(int));
-        char *nome = malloc(10 * sizeof(int));
-        int *telefone = malloc(sizeof(int));
-
-        printf("Digite o nome do contato:\n");
+        long *telefone = malloc(sizeof(long));
+        char *nome = malloc(sizeof(char) * 11);
         scanf("%10s", nome);
-        printf("Digite a idade do contato:\n");
+        printf("Digite a idade: ");
         scanf("%d", idade);
-        printf("Digite o telefone do contato:\n");
-        scanf("%lf", telefone);
+        printf("Digite o telefone: ");
+        scanf("%ld", telefone);
         addContato(nome, idade, telefone, pBuffer);
-        printf("Conrato adicionado com sucesso.\n");
-        free(nome);
         free(idade);
+        free(nome);
         free(telefone);
         break;
     case 2:
-        char *nomeRemover = malloc(sizeof(char) * 11);
-        printf("Digite o nome do contato: ");
-        scanf("%s", nomeRemover);
-        delContato(nomeRemover, pBuffer);
-        printf("Contato excluido com sucesso.\n");
-        free(nomeRemover);
+        printf("Quantos quer listar? ");
+        int *total = malloc(sizeof(int));
+        scanf("%d", total);
+        list(pBuffer, total);
+        free(total);
         break;
     case 3:
-        char *nomeProcura = malloc(sizeof(char) * 11);
         printf("Digite o nome do contato a ser exibido: ");
-        scanf(" %s", nomeProcura);
-        procurarContato(pBuffer, nomeProcura);
-        free(nomeProcura);
+        char *nomeBuscar = malloc(sizeof(char) * 11);
+        scanf(" %s", nomeBuscar);
+        procurarContato(pBuffer, nomeBuscar);
+        free(nomeBuscar);
         break;
     case 4:
-        int* numLista = malloc(sizeof(int));
-        printf("Quantos contatos deseja listar? ");
-        scanf("%d", numLista);
-        listarContato(pBuffer, numLista);
-        free(numLista);
+        printf("Digite o nome do contato a ser apagado: ");
+        char *nomeBusca = malloc(sizeof(char) * 11);
+        scanf(" %s", nomeBusca);
+        delContato(nomeBusca, pBuffer);
+        free(nomeBusca);
         break;
     case 5:
-    *rodando = 1;
-    break;
+        *rodando = 1;
+        freeList(pBuffer);
+        break;
     default:
-        printf("Opção invalida, digite uma opçao valida!!!");
-        menu();
+        printf("\nOpcao invalidas\n");
         break;
     }
 }
 
-int main(int argc, char *argv[])
-{
-    rodando = (int *)malloc(sizeof(int));
-    *rodando = 0;
-    pBuffer = malloc(sizeof(void **));
-    *pBuffer = NULL;
-
-    while (*rodando == 0)
-        menu();
-
-    free(rodando);
-    free(pBuffer);
-    return 0;
-}
