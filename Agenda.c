@@ -134,12 +134,12 @@ void procurarContato(void** head,char* nome){
         *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
     }
     *ant = *atual;
-    printf("-------------------------------\n");
+    printf("\nContato: \n");
     printf("Nome: %s\n", (char*)*ant);
     *ant += sizeof(char) * 11;
     printf("Idade: %d\n", *(int*)*ant);
     *ant += sizeof(int);
-    printf("Number: %ld\n", *(long*)*ant);
+    printf("Telefone: %ld\n", *(long*)*ant);
     free(ant);
     free(atual);
 }
@@ -154,12 +154,12 @@ void list(void** head, int* total){
     *c = 0;
     while (*atual != NULL && *total > *c) {
         *ant = *atual;
-        printf("-------------------------------\n");
+        printf("\nContato: \n");
         printf("Nome: %s\n", (char*)*(void**)ant);
         *ant += sizeof(char) * 11;
         printf("Idade: %d\n", *(int*)*ant);
         *ant += sizeof(int);
-        printf("Number: %ld\n", *(long*)*ant);
+        printf("Telefone: %ld\n", *(long*)*ant);
         *atual = *(void**)(*atual + sizeof(char) * 11 + sizeof(int) + sizeof(long) + sizeof(void**));
         (*c)++;
     }
@@ -230,15 +230,17 @@ void menu()
         printf("Digite o telefone: ");
         scanf("%ld", telefone);
         addContato(nome, idade, telefone, pBuffer);
+        printf("Contato adicionado com sucesso!\n");
         free(idade);
         free(nome);
         free(telefone);
         break;
     case 2:
-        printf("Quantos quer listar? ");
+        printf("Quantos contatos quer listar? ");
         int *total = malloc(sizeof(int));
         scanf("%d", total);
         list(pBuffer, total);
+        printf("\n");
         free(total);
         break;
     case 3:
@@ -246,6 +248,7 @@ void menu()
         char *nomeBuscar = malloc(sizeof(char) * 11);
         scanf(" %s", nomeBuscar);
         procurarContato(pBuffer, nomeBuscar);
+        printf("\n");
         free(nomeBuscar);
         break;
     case 4:
@@ -253,6 +256,7 @@ void menu()
         char *nomeBusca = malloc(sizeof(char) * 11);
         scanf(" %s", nomeBusca);
         delContato(nomeBusca, pBuffer);
+        printf("Contato excluido com sucesso!\n");
         free(nomeBusca);
         break;
     case 5:
@@ -260,8 +264,7 @@ void menu()
         freeList(pBuffer);
         break;
     default:
-        printf("\nOpcao invalidas\n");
+        printf("\nOpcao invalida\n");
         break;
     }
 }
-
