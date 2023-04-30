@@ -7,5 +7,7 @@ Uma subsequência é uma matriz que pode ser extraída de outra matriz excluindo
 elemento sem alterar a ordem dos elementos restantes.
 
 Erros do primeiro: Não resolvia o problema proposto. 
-
+Exemplos: {2,1,3,3}
+          {-1,-2,3,4}
+          {3,4,3,3}
 vídeo: 
